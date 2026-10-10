@@ -5,7 +5,7 @@ from groq import Groq
 st.set_page_config(page_title="BioChat - TÜBİTAK Projesi", page_icon="🧬", layout="wide")
 
 st.title("🧬 BioChat: Tarihi Bilim İnsanları Çoklu Ajan Sistemi")
-st.markdown("Bu platform, tarihe yön veren bilim insanlarının yapay zeka ajanlarıyla tartışma yürütmenizi sağlar, lise öğrencileri tarafından tasarlandı, can aksu ❤️.")
+st.markdown("Bu platform, tarihe yön veren bilim insanlarının yapay zeka ajanlarıyla tartışma yürütmenizi sağlar.")
 
 # Kenar Çubuğu (API Anahtarı ve Bilgi)
 st.sidebar.header("⚙️ Konfigürasyon")
@@ -18,12 +18,12 @@ if not api_key:
 # Groq İstemcisini Başlat
 client = Groq(api_key=api_key)
 
-# Karakterler ve Sistem İstemi Tanımları
+# Karakterler ve Sistem İstemi Tanımları (Doğal, Türkçe ve abartısız ton ayarıyla)
 CHARACTERS = {
-    "Aristoteles": "Sen antik Yunan filozofu Aristoteles'sin. Doğa bilimleri, mantık ve biyoloji üzerine felsefi ve gözlemsel yaklaşımlarla konuşursun.",
-    "Carl Linnaeus": "Sen İsveçli botanikçi Carl Linnaeus'sun. Canlıların sınıflandırılması, ikili adlandırma (binomial nomenclature) ve taksonomi konusunda uzmansın.",
-    "Robert Hooke": "Sen İngiliz fen bilginci Robert Hooke'sun. Mikroskop gözlemleri, hücre kavramı ve fiziksel deneyler üzerine odaklanırsın.",
-    "Antonie van Leeuwenhoek": "Sen mikrobiyolojinin babası Antonie van Leeuwenhoek'sun. Kendi yaptığın mikroskoplarla mikroorganizmaları, bakterileri ve sperm hücrelerini ilk kez gözlemleyen kişisin."
+    "Robert Hooke": "Sen İngiliz fen bilginci Robert Hooke'sun. Mikroskop gözlemleriyle hücre kavramını ilk tanımlayan kişisin. Kesinlikle yabancı dillerde konuşma, sadece akıcı ve doğal bir Türkçe ile bilimsel olarak sade ve net yanıtlar ver, abartıya kaçma.",
+    "Gregor Mendel": "Sen genetiğin babası Gregor Mendel'sin. Bezelyelerle yaptığın deneylerle kalıtım kanunlarını buldun. Kesinlikle yabancı dillerde konuşma, sade, anlaşılır ve doğal bir Türkçe ile kendi alanın hakkında konuş, abartısız ol.",
+    "Aziz Sancar": "Sen Nobel ödüllü Türk biyokimyager ve moleküler biyolog Aziz Sancar'sın. DNA onarımı ve kanser araştırmaları konusunda uzmansın. Doğal, samimi ama profesyonel bir Türkçe ile konuş, gereksiz abartılardan kaçın.",
+    "Marie Curie": "Sen Nobel ödüllü fizikçi ve kimyager Marie Curie'sin. Radyoaktiviteyi keşfeden öncü bir bilim insanısın. Kesinlikle yabancı dil kullanma, sade, kararlı ve doğal bir Türkçe ile net yanıtlar ver, abartma."
 }
 
 # Sohbet Geçmişini Başlat
@@ -45,13 +45,26 @@ if user_input := st.chat_input("Bilim insanlarına bir soru sor veya tartışma 
     with st.chat_message("user"):
         st.write(user_input)
 
-    # Yapay Zeka Karakterlerinin Sırayla Yanıt Vermesi
+    # Yapay Zeka Karakterlerinin Sırayla ve Bağlamı Görerek Yanıt Vermesi
     for name, system_prompt in CHARACTERS.items():
-        prompt = f"Sen {name}'sin. Rolün: {system_prompt}. Kullanıcı veya diğer bilim insanları söyle dedi: {user_input}"
+        messages_payload = [
+            {
+                "role": "system", 
+                "content": f"Sen {name}'sin. Karakter kuralların: {system_prompt}. Kesinlikle başka dillerde (Almanca vb.) konuşma. Tamamen Türkçe, net, doğal ve abartısız bir dille, diğer bilim insanlarının önceki yanıtlarını da dikkate alarak kendi alanına göre katkı sun."
+            }
+        ]
         
+        # Geçmiş sohbetleri modele aktar
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                messages_payload.append({"role": "user", "content": msg["content"]})
+            else:
+                sender_name = msg.get("sender", "Biri")
+                messages_payload.append({"role": "assistant", "content": f"[{sender_name}]: {msg['content']}"})
+
         try:
             response = client.chat.completions.create(
-                messages=[{"role": "user", "content": prompt}],
+                messages=messages_payload,
                 model="openai/gpt-oss-20b",
             )
             

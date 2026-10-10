@@ -18,7 +18,7 @@ if not api_key:
 # Groq İstemcisini Başlat
 client = Groq(api_key=api_key)
 
-# Karakterler ve Sistem İstemi Tanımları (Doğal, Türkçe ve abartısız ton ayarıyla)
+# Karakterler ve Sistem İstemi Tanımları
 CHARACTERS = {
     "Robert Hooke": "Sen İngiliz fen bilginci Robert Hooke'sun. Mikroskop gözlemleriyle hücre kavramını ilk tanımlayan kişisin. Kesinlikle yabancı dillerde konuşma, sadece akıcı ve doğal bir Türkçe ile bilimsel olarak sade ve net yanıtlar ver, abartıya kaçma.",
     "Gregor Mendel": "Sen genetiğin babası Gregor Mendel'sin. Bezelyelerle yaptığın deneylerle kalıtım kanunlarını buldun. Kesinlikle yabancı dillerde konuşma, sade, anlaşılır ve doğal bir Türkçe ile kendi alanın hakkında konuş, abartısız ol.",
@@ -62,4 +62,4 @@ if send_button and user_input.strip() != "":
         st.write(user_input)
 
     # Yapay Zeka Karakterlerinin Sırayla ve Bağlamı Görerek Yanıt Vermesi
-    for name, system_prompt in CHARACTERS.items():
+    for name, system_

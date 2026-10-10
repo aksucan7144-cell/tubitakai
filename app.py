@@ -4,8 +4,8 @@ from groq import Groq
 # Sayfa Yapılandırması
 st.set_page_config(page_title="BioChat - TÜBİTAK Projesi", page_icon="🧬", layout="wide")
 
-st.title("🧬 BioChat: Tarihi Bilim İnsanları Çoklu Ajan Sistemi")
-st.markdown("Bu platform, tarihe yön veren bilim insanlarının yapay zeka ajanlarıyla tartışma yürütmenizi sağlar.")
+st.title("🧬 BioChat: Türk çoklu bilim insanları üzerine ajan sistemi")
+st.markdown("Bu platform, tarihe yön veren bilim insanlarının yapay zeka ajanlarıyla tartışma yürütmenizi sağlar.Lise öğrencisi 9/a sınıfından can aksu tarafından tasarlandı ❤️ ")
 
 # Kenar Çubuğu (API Anahtarı ve Bilgi)
 st.sidebar.header("⚙️ Konfigürasyon")

@@ -40,21 +40,21 @@ for message in st.session_state.messages:
 
 st.markdown("---")
 
-# Akıllı Tahta İçin Butonlu Giriş Alanı (Dokunmatik Uyumlu)
-col1, col2 = st.columns([5, 1])
+# Form Yapısı: Hem Enter tuşuyla hem de Butonla (dokunmatik/klavye) Çalışır
+with st.form(key="chat_form", clear_on_submit=True):
+    col1, col2 = st.columns([5, 1])
+    
+    with col1:
+        user_input = st.text_input(
+            "Sorunuzu veya tartışma konusunu yazın:", 
+            label_visibility="collapsed", 
+            placeholder="Bilim insanlarına bir soru sor veya tartışma konusu at..."
+        )
+        
+    with col2:
+        send_button = st.form_submit_button("🚀 Gönder", use_container_width=True)
 
-with col1:
-    user_input = st.text_input(
-        "Sorunuzu veya tartışma konusunu yazın:", 
-        key="input_text", 
-        label_visibility="collapsed", 
-        placeholder="Bilim insanlarına bir soru sor veya tartışma konusu at..."
-    )
-
-with col2:
-    send_button = st.button("🚀 Gönder", use_container_width=True)
-
-# Butona basıldığında çalıştır
+# Gönder butonuna basıldığında veya Enter'a basıldığında çalışır
 if send_button and user_input.strip() != "":
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):

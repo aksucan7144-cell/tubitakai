@@ -54,12 +54,38 @@ with col1:
 with col2:
     send_button = st.button("🚀 Gönder", use_container_width=True)
 
-# Butona basıldığında veya metin yazıldığında çalıştır
+# Butona basıldığında çalıştır
 if send_button and user_input.strip() != "":
-    # Kullanıcı mesajını kaydet ve göster
     st.session_state.messages.append({"role": "user", "content": user_input})
     with st.chat_message("user"):
         st.write(user_input)
 
-    # Yapay Zeka Karakterlerinin Sırayla ve Bağlamı Görerek Yanıt Vermesi
-    for name, system_
+    for name, system_prompt in CHARACTERS.items():
+        messages_payload = [
+            {
+                "role": "system", 
+                "content": f"Sen {name}'sin. Karakter kuralların: {system_prompt}. Kesinlikle başka dillerde (Almanca vb.) konuşma. Tamamen Türkçe, net, doğal ve abartısız bir dille, diğer bilim insanlarının önceki yanıtlarını da dikkate alarak kendi alanına göre katkı sun."
+            }
+        ]
+        
+        for msg in st.session_state.messages:
+            if msg["role"] == "user":
+                messages_payload.append({"role": "user", "content": msg["content"]})
+            else:
+                sender_name = msg.get("sender", "Biri")
+                messages_payload.append({"role": "assistant", "content": f"[{sender_name}]: {msg['content']}"})
+
+        try:
+            response = client.chat.completions.create(
+                messages=messages_payload,
+                model="openai/gpt-oss-20b",
+            )
+            
+            bot_reply = response.choices[0].message.content
+            
+            st.session_state.messages.append({"role": "assistant", "sender": name, "content": bot_reply})
+            with st.chat_message("assistant"):
+                st.write(f"**{name}**: {bot_reply}")
+                
+        except Exception as e:
+            st.error(f"{name} yanıt verirken bir hata oluştu: {e}")

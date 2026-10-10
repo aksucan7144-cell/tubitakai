@@ -1,2 +1,5 @@
 streamlit
 groq
+ofc api of groq btw
+
+also ik no one will read this but nps broz i love yall

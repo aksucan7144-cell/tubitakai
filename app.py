@@ -18,12 +18,24 @@ if not api_key:
 # Groq İstemcisini Başlat
 client = Groq(api_key=api_key)
 
-# Karakterler ve Sistem İstemi Tanımları
+# Karakterler, Sistem İstemleri ve Karakterlere Özel Avatarlar/Simgeler
 CHARACTERS = {
-    "Robert Hooke": "Sen İngiliz fen bilginci Robert Hooke'sun. Mikroskop gözlemleriyle hücre kavramını ilk tanımlayan kişisin. Kesinlikle yabancı dillerde konuşma, sadece akıcı ve doğal bir Türkçe ile bilimsel olarak sade ve net yanıtlar ver, abartıya kaçma.",
-    "Gregor Mendel": "Sen genetiğin babası Gregor Mendel'sin. Bezelyelerle yaptığın deneylerle kalıtım kanunlarını buldun. Kesinlikle yabancı dillerde konuşma, sade, anlaşılır ve doğal bir Türkçe ile kendi alanın hakkında konuş, abartısız ol.",
-    "Aziz Sancar": "Sen Nobel ödüllü Türk biyokimyager ve moleküler biyolog Aziz Sancar'sın. DNA onarımı ve kanser araştırmaları konusunda uzmansın. Doğal, samimi ama profesyonel bir Türkçe ile konuş, gereksiz abartılardan kaçın.",
-    "Marie Curie": "Sen Nobel ödüllü fizikçi ve kimyager Marie Curie'sin. Radyoaktiviteyi keşfeden öncü bir bilim insanısın. Kesinlikle yabancı dil kullanma, sade, kararlı ve doğal bir Türkçe ile net yanıtlar ver, abartma."
+    "Robert Hooke": {
+        "prompt": "Sen İngiliz fen bilginci Robert Hooke'sun. Mikroskop gözlemleriyle hücre kavramını ilk tanımlayan kişisin. Kesinlikle yabancı dillerde konuşma, sadece akıcı ve doğal bir Türkçe ile bilimsel olarak sade ve net yanıtlar ver, abartıya kaçma.",
+        "avatar": "🔬"  # Mikroskop simgesi
+    },
+    "Gregor Mendel": {
+        "prompt": "Sen genetiğin babası Gregor Mendel'sin. Bezelyelerle yaptığın deneylerle kalıtım kanunlarını buldun. Kesinlikle yabancı dillerde konuşma, sade, anlaşılır ve doğal bir Türkçe ile kendi alanın hakkında konuş, abartısız ol.",
+        "avatar": "🌱"  # Bitki/Bezelye simgesi
+    },
+    "Aziz Sancar": {
+        "prompt": "Sen Nobel ödüllü Türk biyokimyager ve moleküler biyolog Aziz Sancar'sın. DNA onarımı ve kanser araştırmaları konusunda uzmansın. Doğal, samimi ama profesyonel bir Türkçe ile konuş, gereksiz abartılardan kaçın.",
+        "avatar": "🧬"  # DNA simgesi
+    },
+    "Marie Curie": {
+        "prompt": "Sen Nobel ödüllü fizikçi ve kimyager Marie Curie'sin. Radyoaktiviteyi keşfeden öncü bir bilim insanısın. Kesinlikle yabancı dil kullanma, sade, kararlı ve doğal bir Türkçe ile net yanıtlar ver, abartma.",
+        "avatar": "☢️"  # Radyoaktivite/Atom simgesi
+    }
 }
 
 # Sohbet Geçmişini Başlat
@@ -32,15 +44,23 @@ if "messages" not in st.session_state:
 
 # Geçmiş Mesajları Ekrana Yazdır
 for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        if "sender" in message:
-            st.write(f"**{message['sender']}**: {message['content']}")
+    role = message["role"]
+    sender = message.get("sender")
+    
+    # Asistan mesajı ise karakterin kendi avatarını bul
+    avatar_icon = None
+    if role == "assistant" and sender in CHARACTERS:
+        avatar_icon = CHARACTERS[sender]["avatar"]
+        
+    with st.chat_message(role, avatar=avatar_icon):
+        if sender:
+            st.write(f"**{sender}**: {message['content']}")
         else:
             st.write(message["content"])
 
 st.markdown("---")
 
-# Form Yapısı: Hem Enter tuşuyla hem de Butonla (dokunmatik/klavye) Çalışır
+# Form Yapısı: Hem Enter tuşuyla hem de Butonla Çalışır
 with st.form(key="chat_form", clear_on_submit=True):
     col1, col2 = st.columns([5, 1])
     
@@ -60,7 +80,10 @@ if send_button and user_input.strip() != "":
     with st.chat_message("user"):
         st.write(user_input)
 
-    for name, system_prompt in CHARACTERS.items():
+    for name, data in CHARACTERS.items():
+        system_prompt = data["prompt"]
+        char_avatar = data["avatar"]
+        
         messages_payload = [
             {
                 "role": "system", 
@@ -84,7 +107,7 @@ if send_button and user_input.strip() != "":
             bot_reply = response.choices[0].message.content
             
             st.session_state.messages.append({"role": "assistant", "sender": name, "content": bot_reply})
-            with st.chat_message("assistant"):
+            with st.chat_message("assistant", avatar=char_avatar):
                 st.write(f"**{name}**: {bot_reply}")
                 
         except Exception as e:

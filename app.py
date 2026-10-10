@@ -48,7 +48,7 @@ if user_input:
         
         response = client.chat.completions.create(
             messages=[{"role": "user", "content": prompt}],
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant"
         )
         
         bot_reply = response.choices[0].message.content

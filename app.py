@@ -60,4 +60,7 @@ if user_input := st.chat_input("Bilim insanlarına bir soru sor veya tartışma 
             # Karakter yanıtını kaydet ve ekrana yazdır
             st.session_state.messages.append({"role": "assistant", "sender": name, "content": bot_reply})
             with st.chat_message("assistant"):
-                st.write(f"**{name}**: {
+                st.write(f"**{name}**: {bot_reply}")
+                
+        except Exception as e:
+            st.error(f"{name} yanıt verirken bir hata oluştu: {e}")

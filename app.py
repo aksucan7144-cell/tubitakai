@@ -52,7 +52,7 @@ if user_input := st.chat_input("Bilim insanlarına bir soru sor veya tartışma 
         try:
             response = client.chat.completions.create(
                 messages=[{"role": "user", "content": prompt}],
-                model="llama-3.1-8b-instant",
+                model="openai/gpt-oss-20b",
             )
             
             bot_reply = response.choices[0].message.content

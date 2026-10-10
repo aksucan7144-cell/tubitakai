@@ -46,11 +46,9 @@ if user_input:
     for name, system_prompt in CHARACTERS.items():
         prompt = f"Sen {name}'sin. Rolün: {system_prompt}. Kullanıcı veya diğer bilim insanları şöyle dedi: '{user_input}'. Buna kendi tarihi bakış açınla ve 9. sınıf biyoloji düzeyinde kısa ve öz bir yanıt ver."
         
-        response = client.chat.completions.create(
-            messages=[{"role": "user", "content": prompt}],
-            model="llama-3.3-70b"
-        )
-        
+       response = client.chat.completions.create(
+    messages=[{"role": "user", "content": prompt}],
+    model="llama-3.3-70b-versatile",
         bot_reply = response.choices[0].message.content
         
         # Karakter yanıtını kaydet ve ekrana yazdır
